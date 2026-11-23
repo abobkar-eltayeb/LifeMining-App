@@ -4,7 +4,7 @@
 `app/src/main/assets/www/` فتفتح فوراً حتى مع ضعف الإنترنت.
 
 ## الأسعار من Google Sheets
-1. في Google Sheets ارفع `app/src/main/assets/www/prices-template.csv` (ملف ← استيراد). الأعمدة: id | name | price | available.
+1. في Google Sheets ارفع `LifeMining_Prices.xlsx` (في جذر المستودع) (ملف ← استيراد). الأعمدة: id | name | category | unit | price | available.
 2. عدّل `price` (أرقام بالجنيه) و`available` (نعم/لا). الخلية الفارغة = «السعر عند الطلب». لا تغيّر `id`.
 3. شارك الجدول: أي شخص لديه الرابط — عارض.
 4. ضع رابط الجدول في `sheetUrl` داخل `app/src/main/assets/www/products.js` (مرة واحدة) واعمل Commit.
