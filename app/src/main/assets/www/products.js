@@ -6,7 +6,7 @@ window.APP_CONFIG = {
   phoneIntl: '+249910886698',
   phoneLocal: '0910886698',
   showPrices: true,               // تظهر الأسعار فقط للمنتجات التي لها سعر في الجدول؛ الخلية الفارغة = «السعر عند الطلب»
-  sheetUrl: '',                   // رابط Google Sheet العادي (مشاركة: أي شخص لديه الرابط — عارض)
+  sheetUrl: 'https://docs.google.com/spreadsheets/d/1jxa6kWSPRiooVMS_K679b5YxStEVSmR2TvjkK9GCsiQ/edit',                   // رابط Google Sheet العادي (مشاركة: أي شخص لديه الرابط — عارض)
   sheetName: '',                  // اسم الورقة (اتركه فارغاً لأول ورقة)
   sheetCsvUrl: '',                // بديل: رابط CSV منشور على الويب                // رابط Google Sheet المنشور كـ CSV (انظر README) — الأسعار والتوفر تُحدَّث منه تلقائياً
   currency: 'ج.س'
