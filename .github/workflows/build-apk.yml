@@ -1,0 +1,61 @@
+name: Build Android app
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build installable APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifemining-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish latest APK (fixed download link)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk lifemining.apk
+          gh release delete latest -y --cleanup-tag || true
+          gh release create latest lifemining.apk --title "أحدث نسخة من التطبيق" --notes "بُنيت تلقائياً من آخر تعديل (${GITHUB_SHA::7})" --latest
+
+      - name: Build signed bundle for Google Play
+        if: env.KEYSTORE_BASE64 != ''
+        env:
+          LM_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          LM_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          LM_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/lifemining.jks"
+          export LM_KEYSTORE="$RUNNER_TEMP/lifemining.jks"
+          ./gradlew bundleRelease
+
+      - name: Upload Play bundle
+        if: env.KEYSTORE_BASE64 != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifemining-play-bundle
+          path: app/build/outputs/bundle/release/app-release.aab

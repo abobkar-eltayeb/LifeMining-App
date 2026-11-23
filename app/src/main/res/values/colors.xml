@@ -1,0 +1,8 @@
+<resources>
+    <color name="green">#0F1C2E</color>
+    <color name="green_light">#B98A3E</color>
+    <color name="basket">#0F1C2E</color>
+    <color name="disc">#0F1C2E</color>
+    <color name="surface">#0F1C2E</color>
+    <color name="white_bg">#FFFFFF</color>
+</resources>
