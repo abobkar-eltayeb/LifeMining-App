@@ -25,3 +25,8 @@
 
 ## آيفون
 ملف APK لأندرويد فقط. على الآيفون: انشر مجلد `app/src/main/assets/www` على GitHub Pages أو استضافة HTTPS، ثم Safari ← مشاركة ← إضافة إلى الشاشة الرئيسية.
+
+## نسخة الآيفون (والمتصفح) عبر GitHub Pages
+1. في المستودع: Settings ← Pages ← Source: **GitHub Actions** (مرة واحدة).
+2. بعد اكتمال تشغيل «Deploy web app» يظهر الرابط: https://abobkar-eltayeb.github.io/LifeMining-App/
+3. آيفون: افتح الرابط في Safari ← مشاركة ← «إضافة إلى الشاشة الرئيسية».
