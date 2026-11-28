@@ -3,8 +3,8 @@ window.APP_CONFIG = {
   name: 'لايف للتعدين',
   nameEn: 'LIFE MINING',
   whatsapp: '249910578325',      // رقم واتساب للطلبات بصيغة دولية بدون + أو 00
-  phoneIntl: '+249910886698',
-  phoneLocal: '0910886698',
+  phoneIntl: '+249910578325',
+  phoneLocal: '0910578325',
   showPrices: true,               // تظهر الأسعار فقط للمنتجات التي لها سعر في الجدول؛ الخلية الفارغة = «السعر عند الطلب»
   sheetUrl: 'https://docs.google.com/spreadsheets/d/1jxa6kWSPRiooVMS_K679b5YxStEVSmR2TvjkK9GCsiQ/edit',                   // رابط Google Sheet العادي (مشاركة: أي شخص لديه الرابط — عارض)
   sheetName: '',                  // اسم الورقة (اتركه فارغاً لأول ورقة)
