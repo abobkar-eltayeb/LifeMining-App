@@ -1,0 +1,12 @@
+<!doctype html><html dir="rtl"><meta charset="utf-8"><title>diag</title><body>
+<pre id="o">...</pre>
+<form id="f" method="POST" enctype="text/plain"><input type="hidden" name='{"ping":"' value='1"}'><button>POST form</button></form>
+<script src="products.js"></script>
+<script>
+var u=APP_CONFIG.ordersApiUrl,o=document.getElementById('o');document.getElementById('f').action=u;
+o.textContent='url: '+u+'\n';
+fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({ping:1}),redirect:'follow'})
+ .then(function(r){o.textContent+='status '+r.status+' '+r.url+'\n';return r.text();})
+ .then(function(t){o.textContent+='body: '+t.slice(0,500);})
+ .catch(function(e){o.textContent+='ERROR: '+e;});
+</script></body></html>
