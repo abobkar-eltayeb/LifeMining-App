@@ -69,6 +69,24 @@ textarea.f{min-height:80px;resize:vertical}
 .inst{margin-top:10px;width:100%;min-height:46px;border:1px dashed var(--gold);background:#fffaf0;border-radius:12px;color:var(--gold-d);font-weight:700;cursor:pointer}
 .toast{position:fixed;inset-inline:16px;bottom:calc(92px + env(safe-area-inset-bottom));margin:auto;max-width:360px;background:var(--navy);color:#fff;border-radius:12px;padding:10px 14px;text-align:center;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.on{opacity:1}
+.lp{font-size:13px;color:var(--mut);font-weight:400;margin-top:2px}
+.tot{margin:10px 0 4px;padding:12px 14px;border-radius:12px;background:#f4f1e8;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:800;color:var(--navy)}
+.tot small{display:block;font-weight:500;color:var(--mut);font-size:12.5px}
+.tot[hidden]{display:none}
+.who{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:10px;font-size:14.5px}
+.who>div{flex:1;min-width:0}.who[hidden],#reg[hidden],#addrBox[hidden]{display:none}
+.lnk{border:0;background:none;color:var(--navy);font-weight:700;text-decoration:underline;min-height:44px;padding:0 4px;cursor:pointer}
+.hint{margin:12px 0 0;font-size:13.5px;color:var(--mut)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:14px;cursor:pointer}
+.chk input{width:22px;height:22px;flex:none;margin:1px 0 0;accent-color:var(--ok)}
+.gt{margin:14px 0 6px;font-weight:700;font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{margin:0;font-weight:500;font-size:14.5px;cursor:pointer}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.opt input:checked+span{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.opt input:focus-visible+span{outline:3px solid #7aa7ff;outline-offset:2px}
+.send:disabled{opacity:.7;cursor:wait}
 :focus-visible{outline:3px solid #7aa7ff;outline-offset:2px}
 </style>
 </head>
@@ -81,7 +99,7 @@ textarea.f{min-height:80px;resize:vertical}
 </div></header>
 
 <main class="wrap">
-  <section class="hero"><h1>اطلب منتجاتك مباشرة</h1><p>اختر المنتجات وأرسل طلبك على واتساب، ونرد عليك بالسعر والتوفر.</p></section>
+  <section class="hero"><h1>اطلب منتجاتك مباشرة</h1><p>اختر المنتجات، راجع الإجمالي، وأرسل طلبك على واتساب في خطوة واحدة.</p></section>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="ابحث عن منتج…" aria-label="بحث عن منتج" autocomplete="off"></div>
   <div class="chips" id="chips" role="group" aria-label="التصنيفات"></div>
@@ -96,9 +114,18 @@ textarea.f{min-height:80px;resize:vertical}
   <button class="close" id="closeCart" type="button" aria-label="إغلاق">×</button>
   <h2>طلبك</h2>
   <div id="lines"></div>
-  <label for="cName">الاسم *</label><input class="f" id="cName" autocomplete="name">
-  <label for="cPhone">رقم الهاتف</label><input class="f" id="cPhone" type="tel" inputmode="tel" autocomplete="tel">
-  <label for="cCity">المدينة / المنطقة</label><input class="f" id="cCity" autocomplete="address-level2">
+  <div class="tot" id="tot" hidden></div>
+  <div class="who" id="who" hidden></div>
+  <div id="reg">
+    <p class="hint">أول طلب؟ سجّل بياناتك مرة واحدة فقط، ولن نطلبها منك في الطلبات القادمة.</p>
+    <label for="cName">الاسم *</label><input class="f" id="cName" autocomplete="name">
+    <label for="cPhone">رقم الواتساب *</label><input class="f" id="cPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="مثال: 0912345678" dir="ltr">
+    <label for="cCity">المدينة / المنطقة *</label><input class="f" id="cCity" autocomplete="address-level2">
+    <label class="chk"><input type="checkbox" id="cOffers"><span>أوافق على استلام العروض والأسعار الجديدة على الواتساب</span></label>
+  </div>
+  <div class="gt" id="payT">طريقة الدفع *</div><div class="opts" id="payOpts" role="radiogroup" aria-labelledby="payT"></div>
+  <div class="gt" id="delT">طريقة الاستلام *</div><div class="opts" id="delOpts" role="radiogroup" aria-labelledby="delT"></div>
+  <div id="addrBox" hidden><label for="cAddr">عنوان التوصيل *</label><input class="f" id="cAddr" autocomplete="street-address" placeholder="الحي، أقرب معلم، الموقع"></div>
   <label for="cNote">ملاحظات</label><textarea class="f" id="cNote"></textarea>
   <div class="err" id="err" role="alert"></div>
   <button class="send" id="send" type="button">إرسال الطلب عبر واتساب</button>
@@ -147,11 +174,21 @@ function renderGrid(){
   $('grid').innerHTML=h;$('empty').hidden=list.length>0;
 }
 function renderBar(){var n=count();$('bar').hidden=n===0;$('cnt').textContent=n;}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function priced(p){return C.showPrices&&p.price>0;}
+function totals(){var t={sum:0,pieces:0,unpriced:0,lines:0};
+  P.forEach(function(p){var n=cart[p.id];if(!n)return;t.lines++;t.pieces+=n;if(priced(p))t.sum+=n*p.price;else t.unpriced++;});return t;}
+function renderTot(){var t=totals(),el=$('tot');
+  if(!C.showPrices||!t.lines){el.hidden=true;return;}
+  el.hidden=false;
+  el.innerHTML='<div>الإجمالي'+(t.unpriced?'<small>+ '+t.unpriced+' صنف سعره عند الطلب</small>':'')+'</div><div>'+(t.sum?fmt(t.sum)+' '+C.currency:'عند الطلب')+'</div>';}
 function renderCart(){
   var h='';
   P.forEach(function(p){var n=cart[p.id];if(!n)return;
-    h+='<div class="line"><div class="n">'+p.name+'</div><div class="step"><button type="button" data-a="inc" data-id="'+p.id+'" aria-label="زيادة">+</button><span>'+n+'</span><button type="button" data-a="dec" data-id="'+p.id+'" aria-label="إنقاص">−</button></div><button class="rm" type="button" data-a="rm" data-id="'+p.id+'">حذف</button></div>';});
+    var lp=priced(p)?(n+' × '+fmt(p.price)+' = '+fmt(n*p.price)+' '+C.currency):'السعر عند الطلب';
+    h+='<div class="line"><div class="n">'+p.name+'<div class="lp">'+lp+'</div></div><div class="step"><button type="button" data-a="inc" data-id="'+p.id+'" aria-label="زيادة">+</button><span>'+n+'</span><button type="button" data-a="dec" data-id="'+p.id+'" aria-label="إنقاص">−</button></div><button class="rm" type="button" data-a="rm" data-id="'+p.id+'">حذف</button></div>';});
   $('lines').innerHTML=h||'<div class="empty">الطلب فارغ</div>';
+  renderTot();
 }
 function refresh(){renderGrid();renderBar();renderCart();save();}
 function act(a,id){
@@ -161,30 +198,128 @@ function act(a,id){
   refresh();if(count()===0)closeCart();
 }
 document.addEventListener('click',function(e){
+  if(e.target.closest('#editMe')){editing=true;renderWho();$('cName').focus();return;}
   var b=e.target.closest('[data-a]');if(b){act(b.dataset.a,b.dataset.id);return;}
   var c=e.target.closest('.chip');if(c){cat=c.dataset.c;renderChips();renderGrid();}
 });
 $('q').addEventListener('input',function(e){query=e.target.value;renderGrid();});
-function openCart(){renderCart();$('ov').classList.add('on');$('sheet').classList.add('on');$('err').textContent='';}
+function openCart(){renderCart();renderWho();$('ov').classList.add('on');$('sheet').classList.add('on');$('err').textContent='';}
 function closeCart(){$('ov').classList.remove('on');$('sheet').classList.remove('on');}
 $('openCart').onclick=openCart;$('closeCart').onclick=closeCart;$('ov').onclick=closeCart;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeCart();});
-$('cName').addEventListener('input',function(){$('err').textContent='';});
-['cName','cPhone','cCity','cNote'].forEach(function(i){try{var v=localStorage.getItem('lm_'+i);if(v)$(i).value=v;}catch(e){}$(i).addEventListener('input',function(){try{localStorage.setItem('lm_'+i,$(i).value);}catch(e){}});});
 
-window.buildMessage=function(){
-  var L=['السلام عليكم، أرغب في طلب المنتجات التالية من '+C.name+':',''],i=0;
-  P.forEach(function(p){var n=cart[p.id];if(!n)return;i++;L.push(i+') '+p.name+' — الكمية: '+n+(p.unit?' '+p.unit:''));});
-  L.push('');L.push('الاسم: '+$('cName').value.trim());
-  var ph=$('cPhone').value.trim(),ct=$('cCity').value.trim(),nt=$('cNote').value.trim();
-  if(ph)L.push('الهاتف: '+ph);if(ct)L.push('المنطقة: '+ct);if(nt)L.push('ملاحظات: '+nt);
+/* ===== بيانات العميل: تُسجَّل مرة واحدة وتُحفظ على الجهاز ===== */
+function lsGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var prof=lsGet('lm_profile',null),editing=false,busy=false;
+function profOk(p){return !!(p&&p.name&&p.phone&&p.city);}
+function intlPhone(s){var d=digits(s).replace(/\D/g,'');
+  if(d.indexOf('00')===0)d=d.slice(2);
+  if(d.length===10&&d[0]==='0')d='249'+d.slice(1);
+  else if(d.length===9&&(d[0]==='9'||d[0]==='1'))d='249'+d;
+  return d;}
+function renderWho(){
+  var has=profOk(prof)&&!editing;
+  $('reg').hidden=has;$('who').hidden=!has;
+  if(has){$('who').innerHTML='<div>يتم الطلب باسم: <b>'+esc(prof.name)+'</b><br><span dir="ltr">'+esc(prof.phone)+'</span> — '+esc(prof.city)+'</div><button type="button" class="lnk" id="editMe">تعديل بياناتي</button>';return;}
+  var src=prof||{name:localStorage.getItem('lm_cName')||'',phone:localStorage.getItem('lm_cPhone')||'',city:localStorage.getItem('lm_cCity')||'',offers:false};
+  if(!$('cName').value)$('cName').value=src.name||'';
+  if(!$('cPhone').value)$('cPhone').value=src.phone||'';
+  if(!$('cCity').value)$('cCity').value=src.city||'';
+  if(prof)$('cOffers').checked=!!prof.offers;
+}
+['cName','cPhone','cCity','cAddr','cNote'].forEach(function(i){$(i).addEventListener('input',function(){$('err').textContent='';});});
+try{var nv=localStorage.getItem('lm_note');if(nv)$('cNote').value=nv;}catch(e){}
+$('cNote').addEventListener('input',function(){try{localStorage.setItem('lm_note',$('cNote').value);}catch(e){}});
+$('cAddr').value=lsGet('lm_addr','')||'';
+
+/* ===== طريقة الدفع والاستلام ===== */
+function renderOpts(box,name,list,saved){
+  $(box).innerHTML=list.map(function(v){return '<label class="opt"><input type="radio" name="'+name+'" value="'+esc(v)+'"'+(v===saved?' checked':'')+'><span>'+esc(v)+'</span></label>';}).join('');}
+function picked(name){var r=document.querySelector('input[name="'+name+'"]:checked');return r?r.value:'';}
+var PAY=C.paymentMethods||['نقداً عند الاستلام','تحويل بنكك'],DEL=C.deliveryMethods||['توصيل','استلام من موقع الشركة'];
+renderOpts('payOpts','pay',PAY,lsGet('lm_pay',''));
+renderOpts('delOpts','del',DEL,lsGet('lm_del',''));
+function isDelivery(){return picked('del')===DEL[0];}
+function syncAddr(){$('addrBox').hidden=!isDelivery();}
+document.addEventListener('change',function(e){if(e.target.name==='del'){syncAddr();$('err').textContent='';}if(e.target.name==='pay')$('err').textContent='';});
+syncAddr();
+
+/* ===== بناء الطلب والرسالة ===== */
+function buildOrder(){
+  var t=totals(),items=[];
+  P.forEach(function(p){var n=cart[p.id];if(!n)return;items.push({id:p.id,name:p.name,unit:p.unit||'',qty:n,price:priced(p)?p.price:0});});
+  return {ref:Date.now().toString(36)+Math.random().toString(36).slice(2,7),orderId:'',name:prof.name,phone:prof.phoneIntl,phoneLocal:prof.phone,city:prof.city,offers:!!prof.offers,
+    items:items,total:t.sum,unpriced:t.unpriced,payment:picked('pay'),delivery:picked('del'),address:isDelivery()?$('cAddr').value.trim():'',note:$('cNote').value.trim(),
+    created:new Date().toISOString()};
+}
+function orderMessage(o){
+  var L=['السلام عليكم، طلب جديد من تطبيق '+C.name];
+  if(o.orderId)L.push('رقم الطلب: '+o.orderId);
+  L.push('');
+  o.items.forEach(function(it,i){L.push((i+1)+') '+it.name+' — '+it.qty+(it.unit?' '+it.unit:'')+(it.price?(' × '+fmt(it.price)+' = '+fmt(it.qty*it.price)+' '+C.currency):' — السعر عند الطلب'));});
+  L.push('');
+  if(C.showPrices)L.push('الإجمالي: '+(o.total?fmt(o.total)+' '+C.currency:'عند الطلب')+(o.unpriced&&o.total?' (+ '+o.unpriced+' صنف سعره عند الطلب)':''));
+  L.push('طريقة الدفع: '+o.payment);
+  L.push('طريقة الاستلام: '+o.delivery+(o.address?' — العنوان: '+o.address:''));
+  L.push('');
+  L.push('الاسم: '+o.name);L.push('الواتساب: '+o.phoneLocal);L.push('المنطقة: '+o.city);
+  if(o.note)L.push('ملاحظات: '+o.note);
   return L.join('\n');
-};
+}
+window.buildMessage=function(){return orderMessage(buildOrder());};
+
+/* ===== إرسال الطلب إلى Google Sheet (Apps Script) ===== */
+function postText(url,body){
+  if(window.AndroidBridge&&window.AndroidBridge.postJson)return new Promise(function(res,rej){
+    var id='p'+Date.now()+Math.random().toString(36).slice(2);window.__cbs[id]={res:res,rej:rej};window.AndroidBridge.postJson(url,body,id);
+    setTimeout(function(){if(window.__cbs[id]){delete window.__cbs[id];rej(new Error('timeout'));}},12000);});
+  return Promise.race([
+    fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,redirect:'follow'}).then(function(r){if(!r.ok)throw 0;return r.text();}),
+    new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]);
+}
+function registerOrder(o){
+  if(!C.ordersApiUrl)return Promise.reject(new Error('no api'));
+  return postText(C.ordersApiUrl,JSON.stringify(o)).then(function(t){var j=JSON.parse(t);if(!j||!j.ok||!j.orderId)throw new Error('bad');return j.orderId;});
+}
+function localId(){var d=new Date(),p=function(n){return ('0'+n).slice(-2);};
+  return 'LM-'+String(d.getFullYear()).slice(2)+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());}
+/* الطلبات التي لم تصل للشيت (انقطاع إنترنت) تُحفظ وتُعاد محاولة إرسالها عند فتح التطبيق */
+function queueOrder(o){var q=lsGet('lm_queue',[]);q.push(o);lsSet('lm_queue',q.slice(-30));}
+function flushQueue(){
+  var q=lsGet('lm_queue',[]);if(!q.length||!C.ordersApiUrl)return;
+  var o=q[0];
+  registerOrder(o).then(function(){var r=lsGet('lm_queue',[]).filter(function(x){return x.ref!==o.ref;});lsSet('lm_queue',r);if(r.length)setTimeout(flushQueue,1500);}).catch(function(){});
+}
+
 $('send').onclick=function(){
-  if(count()===0){$('err').textContent='أضف منتجاً واحداً على الأقل.';return;}
-  if(!$('cName').value.trim()){$('err').textContent='اكتب اسمك من فضلك.';$('cName').focus();return;}
+  if(busy)return;
+  var err=function(m,f){$('err').textContent=m;if(f)$(f).focus();};
+  if(count()===0)return err('أضف منتجاً واحداً على الأقل.');
+  if(!profOk(prof)||editing){
+    var nm=$('cName').value.trim(),ph=$('cPhone').value.trim(),ct=$('cCity').value.trim(),pi=intlPhone(ph);
+    if(!nm)return err('اكتب اسمك من فضلك.','cName');
+    if(pi.length<11||pi.length>15)return err('اكتب رقم واتساب صحيح، مثال: 0912345678','cPhone');
+    if(!ct)return err('اكتب المدينة أو المنطقة.','cCity');
+    prof={name:nm,phone:ph,phoneIntl:pi,city:ct,offers:$('cOffers').checked};
+  }
+  if(!picked('pay'))return err('اختر طريقة الدفع.');
+  if(!picked('del'))return err('اختر طريقة الاستلام.');
+  if(isDelivery()&&!$('cAddr').value.trim())return err('اكتب عنوان التوصيل.','cAddr');
   $('err').textContent='';
-  window.location.href=wa(window.buildMessage());
+  lsSet('lm_profile',prof);editing=false;
+  lsSet('lm_pay',picked('pay'));lsSet('lm_del',picked('del'));lsSet('lm_addr',$('cAddr').value.trim());
+  var o=buildOrder(),btn=$('send'),label=btn.textContent;
+  busy=true;btn.disabled=true;btn.textContent='جاري تسجيل الطلب…';
+  var hasApi=!!C.ordersApiUrl;
+  registerOrder(o).then(function(id){o.orderId=id;}).catch(function(){if(hasApi){o.orderId=localId();queueOrder(o);}}).then(function(){
+    busy=false;btn.disabled=false;btn.textContent=label;
+    var msg=orderMessage(o);
+    cart={};try{localStorage.removeItem('lm_note');}catch(e){}$('cNote').value='';
+    refresh();closeCart();
+    if(o.orderId)toast('تم تسجيل طلبك رقم '+o.orderId);
+    window.location.href=wa(msg);
+  });
 };
 $('callTop').href=tel();$('callSheet').href=tel();$('askLink').href=wa('السلام عليكم، أرغب في الاستفسار عن منتج: '+query);
 
@@ -235,7 +370,7 @@ function syncSheet(){
  try{var c=localStorage.getItem('lm_sheet');if(c&&applySheet(c))refresh();}catch(e){}
  getText(u).then(function(t){if(/^\s*</.test(t))return;
   if(applySheet(t)){try{localStorage.setItem('lm_sheet',t);}catch(e){}refresh();}}).catch(function(){});}
-renderChips();refresh();syncSheet();
+renderChips();refresh();syncSheet();setTimeout(flushQueue,2500);
 })();
 </script>
 </body>

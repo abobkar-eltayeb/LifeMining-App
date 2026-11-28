@@ -145,10 +145,59 @@ class MainActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     result = null
                 }
-                val js = "window.__nativeFetchDone(" + JSONObject.quote(callbackId) + "," +
-                    (if (result == null) "null" else JSONObject.quote(result)) + ")"
-                main.post { webView.evaluateJavascript(js, null) }
+                done(callbackId, result)
             }.start()
+        }
+
+        /** إرسال الطلب وبيانات العميل إلى Google Apps Script (شيت الطلبات والعملاء) */
+        @JavascriptInterface
+        fun postJson(url: String, body: String, callbackId: String) {
+            Thread {
+                var result: String? = null
+                try {
+                    var u = URL(url)
+                    if (u.protocol == "https" && u.host == "script.google.com") {
+                        var c = u.openConnection() as HttpURLConnection
+                        c.connectTimeout = 10000
+                        c.readTimeout = 15000
+                        c.instanceFollowRedirects = false
+                        c.requestMethod = "POST"
+                        c.doOutput = true
+                        c.setRequestProperty("Content-Type", "text/plain;charset=utf-8")
+                        c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+                        var code = c.responseCode
+                        var hops = 0
+                        // Apps Script يرد بتحويلة إلى script.googleusercontent.com تُقرأ بطلب GET
+                        while (code in 300..399 && hops < 5) {
+                            val loc = c.getHeaderField("Location") ?: break
+                            c.disconnect()
+                            u = URL(u, loc)
+                            if (u.protocol != "https" ||
+                                !(u.host == "script.google.com" || u.host.endsWith(".googleusercontent.com"))
+                            ) break
+                            c = u.openConnection() as HttpURLConnection
+                            c.connectTimeout = 10000
+                            c.readTimeout = 15000
+                            c.instanceFollowRedirects = false
+                            code = c.responseCode
+                            hops++
+                        }
+                        if (code in 200..299) {
+                            result = c.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                        }
+                        c.disconnect()
+                    }
+                } catch (e: Exception) {
+                    result = null
+                }
+                done(callbackId, result)
+            }.start()
+        }
+
+        private fun done(callbackId: String, result: String?) {
+            val js = "window.__nativeFetchDone(" + JSONObject.quote(callbackId) + "," +
+                (if (result == null) "null" else JSONObject.quote(result)) + ")"
+            main.post { webView.evaluateJavascript(js, null) }
         }
     }
 }

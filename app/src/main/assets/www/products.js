@@ -9,7 +9,12 @@ window.APP_CONFIG = {
   sheetUrl: 'https://docs.google.com/spreadsheets/d/1jxa6kWSPRiooVMS_K679b5YxStEVSmR2TvjkK9GCsiQ/edit',                   // رابط Google Sheet العادي (مشاركة: أي شخص لديه الرابط — عارض)
   sheetName: '',                  // اسم الورقة (اتركه فارغاً لأول ورقة)
   sheetCsvUrl: '',                // بديل: رابط CSV منشور على الويب                // رابط Google Sheet المنشور كـ CSV (انظر README) — الأسعار والتوفر تُحدَّث منه تلقائياً
-  currency: 'ج.س'
+  currency: 'ج.س',
+  // رابط تطبيق الويب من Google Apps Script (ينتهي بـ /exec) — لحفظ العملاء والطلبات في شيت «طلبات وعملاء لايف للتعدين»
+  // إذا تُرك فارغاً يعمل التطبيق كالسابق: يرسل الطلب على واتساب فقط بدون رقم طلب ولا حفظ في الشيت
+  ordersApiUrl: '',
+  paymentMethods: ['نقداً عند الاستلام', 'تحويل بنكك', 'تحويل بنكي آخر'],
+  deliveryMethods: ['توصيل', 'استلام من موقع الشركة']
 };
 /* cat: التصنيف — unit: وحدة البيع (اختياري) — price: السعر بالجنيه السوداني (يظهر فقط إذا showPrices = true) */
 window.CATEGORIES = [
