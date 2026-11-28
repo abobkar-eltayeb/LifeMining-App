@@ -12,7 +12,7 @@ window.APP_CONFIG = {
   currency: 'ج.س',
   // رابط تطبيق الويب من Google Apps Script (ينتهي بـ /exec) — لحفظ العملاء والطلبات في شيت «طلبات وعملاء لايف للتعدين»
   // إذا تُرك فارغاً يعمل التطبيق كالسابق: يرسل الطلب على واتساب فقط بدون رقم طلب ولا حفظ في الشيت
-  ordersApiUrl: '',
+  ordersApiUrl: 'https://script.google.com/macros/s/AKfycbyLtcsG0n0sHZqSkhonnYM_bWQuSIrbWzAL_aHTrMi_7PO6qFZPib6Xj5DwnY1xgILMMQ/exec',
   paymentMethods: ['نقداً عند الاستلام', 'تحويل بنكك', 'تحويل بنكي آخر'],
   deliveryMethods: ['توصيل', 'استلام من موقع الشركة']
 };
